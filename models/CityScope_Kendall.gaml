@@ -44,8 +44,7 @@ global {
 	 "pub"::[rgb(255,99,71),square(50)], "restaurant"::[rgb(255,215,0),square(50)], "theatre"::[rgb(255,255,255),triangle(50)]];
 	 	 
 	list category_color<- [rgb(0,0,255), rgb(255,255,0), rgb(255,0,0)];
-	list amenity_type <-["arts_centre", "bar", "cafe", "cinema","fast_food","market_place","music_club","night_club","pub","restaurant","theatre"];
-	 
+	list amenity_type <-["arts_centre", "bar", "cafe", "cinema","fast_food","market_place","music_club","night_club","pub","restaurant","theatre"]; 
 	 
 	//INTERACTION GRAPH 
 	graph my_graph;
@@ -178,7 +177,7 @@ species building schedules: []{
 	float depth;
 	
 	aspect base {	
-     	draw shape color: rgb(75,75,75,125);// depth:depth*shape.area*0.00005;	
+     	draw shape color: rgb(50,50,50,125);// depth:depth*shape.area*0.00005;	
 	}
 }
 
@@ -209,48 +208,37 @@ species people skills:[moving]{
 	float radius;
 	
 	reflex time_to_work when: current_hour > time_to_work and current_hour < time_to_lunch  and objective = "resting"{
-		//if(flip(0.1)){
 			objective <- "working" ;
 			curMovingMode <- "travelling";
 			the_target <- any_location_in (working_place);
 			speed <-initialSpeed;	
-		//}
-		
 	}
 	
 	reflex time_to_go_lunch when: current_hour > time_to_lunch and current_hour < time_to_rework and objective = "working"{
-		//if(flip(0.1)){
 			objective <- "eating" ;
 			curMovingMode <- "travelling";
 			the_target <- any_location_in (eating_place); 
 			speed <-initialSpeed;
-		//}
 	} 
 	
 	reflex time_to_go_rework when: current_hour > time_to_rework and current_hour < time_to_dinner  and objective = "eating"{
-		//if(flip(0.1)){
 			objective <- "reworking" ;
 			curMovingMode <- "travelling";
 			the_target <- any_location_in (working_place);
 			speed <-initialSpeed;
-		//} 
 	} 
 	reflex time_to_go_dinner when: current_hour > time_to_dinner and current_hour < time_to_sleep  and objective = "reworking"{
-		//if(flip(0.1)){
 			objective <- "dinning" ;
 			curMovingMode <- "travelling";
 			the_target <- any_location_in (dining_place);
 			speed <-initialSpeed; 
-		//}
 	} 
 	
 	reflex time_to_go_home when: current_hour > time_to_sleep and (current_hour < 24) and objective = "dinning"{
-		//if(flip(0.1)){
 			objective <- "resting" ;
 			curMovingMode <- "travelling";
 			the_target <- any_location_in (living_place);
 			speed <-initialSpeed; 
-		//}
 	} 
 	 
 	reflex move {//when: the_target != nil {
@@ -294,9 +282,9 @@ species amenity schedules:[]{
 	rgb color;
 	aspect base {
 		if(scenario = 3){
-			//draw shape color: color depth:density*10;
-			draw circle(50) empty:true color: rgb(125,125,125) border: rgb(125,125,125);
-		    draw circle(50) color: rgb(75,75,75,125);	
+			draw shape color: color ;//depth:density*10;
+			//draw circle(50) empty:true color: rgb(125,125,125) border: rgb(125,125,125);
+		    //draw circle(50) color: rgb(75,75,75,125);	
 		}else{
 		  draw circle(50) empty:true color: rgb(125,125,125) border: rgb(125,125,125);
 		  draw circle(50) color: rgb(75,75,75,125);	
@@ -312,7 +300,7 @@ experiment CityScope type: gui {
 		display CityScope  type:opengl background:#black keystone:true{
 			species building aspect: base refresh:false;
 			//species road aspect: base refresh:false;
-			species amenity aspect: base transparency:0.7;
+			species amenity aspect: base transparency:0.8;
 			species people aspect: dynamic;
 			graphics "text" 
 			{
@@ -328,7 +316,7 @@ experiment CityScope type: gui {
 					loop eg over: my_graph.edges {
 						geometry edge_geom <- geometry(eg);
 						float val <- 255 * edge_geom.perimeter / distance; 
-						draw line(edge_geom.points)  color: rgb(175,175,175);
+						draw line(edge_geom.points)  color: rgb(75,75,75);
 					}
 				}	
 			}	
