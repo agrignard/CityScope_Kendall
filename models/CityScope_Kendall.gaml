@@ -1,7 +1,10 @@
 /**
 * Name: CityScope Kendall
 * Author: Arnaud Grignard
-* Description: An agent-based model running on the CityScope Ken
+* Description: An agent-based model running on the CityScope Kendall
+* Scenario 1: Existing amenities
+* Scenario 2: Volpe Amenities
+* Scenario 3: CityMatrix Amenities
 * Tags: gis
 */
 
@@ -282,12 +285,12 @@ species amenity schedules:[]{
 	rgb color;
 	aspect base {
 		if(scenario = 3){
-			draw shape color: color ;//depth:density*10;
+			draw shape color: rgb(color.red, color.green, color.blue,50) ;//depth:density*10;
 			//draw circle(50) empty:true color: rgb(125,125,125) border: rgb(125,125,125);
 		    //draw circle(50) color: rgb(75,75,75,125);	
 		}else{
-		  draw circle(50) empty:true color: rgb(125,125,125) border: rgb(125,125,125);
-		  draw circle(50) color: rgb(75,75,75,125);	
+		  draw circle(50) empty:true border: #white;
+		  draw circle(50) color: rgb(125,125,125,125);	
 		}
 		
 	}
@@ -300,7 +303,7 @@ experiment CityScope type: gui {
 		display CityScope  type:opengl background:#black keystone:true{
 			species building aspect: base refresh:false;
 			//species road aspect: base refresh:false;
-			species amenity aspect: base transparency:0.8;
+			species amenity aspect: base position:{0,0,0.001};
 			species people aspect: dynamic;
 			graphics "text" 
 			{
