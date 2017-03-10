@@ -8,10 +8,10 @@
 model CityScope_Kendall
 
 global {
-	file bound_shapefile <- file("../includes/bounds.shp");
+	file bound_shapefile <- file("../includes/Bounds.shp");
 	file buildings_shapefile <- file("../includes/Buildings.shp");
 	file roads_shapefile <- file("../includes/Roads.shp");
-	file amenities_shapefile <- file("../includes/small_amenities.shp");
+	file amenities_shapefile <- file("../includes/Amenities.shp");
 	file amenities_volpe_shapefile <- file("../includes/volpe_amenities.shp");
 	geometry shape <- envelope(bound_shapefile);
 	float step <- 10 #sec;
