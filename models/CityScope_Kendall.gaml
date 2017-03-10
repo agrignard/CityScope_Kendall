@@ -5,7 +5,6 @@
 * Scenario 1: Existing amenities
 * Scenario 2: Volpe Amenities
 * Scenario 3: CityMatrix Amenities
-* Tags: gis
 */
 
 model CityScope_Kendall
