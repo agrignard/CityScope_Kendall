@@ -19,7 +19,7 @@ global {
 	file imageRaster <- file('../images/gama_black.png') ;
 	float step <- 10 #sec;
 	int nb_people <- 1000;
-	int current_hour update: (time / #hour) mod 24 + 6 ;
+	int current_hour update: (time / #hour) mod 24 ;
 	int min_work_start <- 5;
 	int max_work_start <- 10;
 	int min_lunch_start <- 11;
@@ -294,7 +294,7 @@ species amenity {
 	}
 	aspect base {
 		if(scenario = 3){
-			draw shape color: rgb(color.red, color.green, color.blue,50);//depth:pop*10;
+			draw shape color: rgb(color.red, color.green, color.blue,75);//depth:pop*10;
 			//draw circle(50) empty:true color: rgb(125,125,125) border: rgb(125,125,125);
 		    //draw circle(50) color: rgb(75,75,75,125);	
 		}else{
@@ -319,9 +319,9 @@ experiment CityScope type: gui {
                //draw square(100) color:#blue at: { 5000, 5200};   draw "$" color: # white font: font("Helvetica", 20, #bold) at: { 5075, 5250};
                //draw square(100) color:#yellow at: { 5300, 5200};   draw "$$" color: # white font: font("Helvetica", 20, #bold) at: { 5375, 5250};
                //draw square(100) color:#red at: { 5600, 5200};   draw "$$$" color: # white font: font("Helvetica", 20, #bold) at: { 5675, 5250};
-               draw string(current_hour) + "h" color: # white font: font("Helvetica", 20, #italic) at: { 6000, 5000};
-               draw "1000 people "color: # white font: font("Helvetica", 15, #italic) at: { 6000, 5200};
-               draw imageRaster size:75#px at: { 7000, 6000};
+               draw string(current_hour) + "h" color: # white font: font("Helvetica", 30, #italic) at: { 5000, 5000};
+               draw "1000 people "color: # white font: font("Helvetica", 25, #italic) at: { 5000, 5300};
+               draw imageRaster size:40#px at: { 7000, 6000};
             }
            
             	graphics "edges" {
