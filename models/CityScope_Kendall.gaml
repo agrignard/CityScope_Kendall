@@ -10,6 +10,7 @@
 model CityScope_Kendall
 
 global {
+	file table_bound_shapefile <- file("../includes/table_bounds.shp");
 	file bound_shapefile <- file("../includes/Bounds.shp");
 	file buildings_shapefile <- file("../includes/Buildings.shp");
 	file roads_shapefile <- file("../includes/Roads.shp");
@@ -68,6 +69,8 @@ global {
 		}	
 		create road from: roads_shapefile ;
 		the_graph <- as_edge_graph(road);
+		
+		create table from: table_bound_shapefile;
 		
 		//FROM FILE
 		if(scenario = 1){
@@ -305,11 +308,18 @@ species amenity {
 	}
 }
 
+species table{
+	aspect base {
+		draw shape empty:true border:#green color: #green ;
+	}	
+}
+
 experiment CityScope type: gui {	
 	float minimum_cycle_duration <- 0.02;
 	output {
 		
 		display CityScope  type:opengl background:#black keystone:true synchronized:false{
+			species table aspect:base;
 			species building aspect: base refresh:false position:{0,0,-0.001};
 			//species road aspect: base refresh:false;
 			species amenity aspect: base ;
