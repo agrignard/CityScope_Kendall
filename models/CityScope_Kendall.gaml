@@ -314,11 +314,47 @@ species table{
 	}	
 }
 
+
 experiment CityScope type: gui {	
 	float minimum_cycle_duration <- 0.02;
 	output {
 		
 		display CityScope  type:opengl background:#black keystone:true synchronized:false{
+			species table aspect:base;
+			species building aspect: base refresh:false position:{0,0,-0.001};
+			//species road aspect: base refresh:false;
+			species amenity aspect: base ;
+			species people aspect: dynamic;
+			graphics "text" 
+			{
+               //draw square(100) color:#blue at: { 5000, 5200};   draw "$" color: # white font: font("Helvetica", 20, #bold) at: { 5075, 5250};
+               //draw square(100) color:#yellow at: { 5300, 5200};   draw "$$" color: # white font: font("Helvetica", 20, #bold) at: { 5375, 5250};
+               //draw square(100) color:#red at: { 5600, 5200};   draw "$$$" color: # white font: font("Helvetica", 20, #bold) at: { 5675, 5250};
+               draw string(current_hour) + "h" color: # white font: font("Helvetica", 25, #italic) at: { 5700, 6200};
+              // draw "1000 people "color: # white font: font("Helvetica", 25, #italic) at: { 5000, 5300};
+               draw imageRaster size:40#px at: { 7000, 6000};
+            }
+           
+            	graphics "edges" {
+		      //Creation of the edges of adjacence
+				if (my_graph != nil  and drawInteraction = true ) {
+					loop eg over: my_graph.edges {
+						geometry edge_geom <- geometry(eg);
+						float val <- 255 * edge_geom.perimeter / distance; 
+						draw line(edge_geom.points)  color: rgb(75,75,75);
+					}
+				}	
+			}	
+		}
+	}
+}
+
+
+experiment CityScopeKeystone type: gui {	
+	float minimum_cycle_duration <- 0.02;
+	output {
+		
+		display CityScope  type:opengl background:#black keystone:true fullscreen:1{
 			species table aspect:base;
 			species building aspect: base refresh:false position:{0,0,-0.001};
 			//species road aspect: base refresh:false;
