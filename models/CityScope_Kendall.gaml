@@ -310,7 +310,7 @@ species amenity {
 
 species table{
 	aspect base {
-		draw shape empty:true border:#green color: #green ;
+		draw shape empty:false border:#green color: #green ;
 	}	
 }
 
