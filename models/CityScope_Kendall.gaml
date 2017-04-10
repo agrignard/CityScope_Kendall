@@ -16,7 +16,7 @@ global {
 	file roads_shapefile <- file("../includes/Roads.shp");
 	file amenities_shapefile <- file("../includes/Amenities.shp");
 	file amenities_volpe_shapefile <- file("../includes/volpe_amenities.shp");
-	geometry shape <- envelope(bound_shapefile);
+	geometry shape <- envelope(table_bound_shapefile);
 	file imageRaster <- file('../images/gama_black.png') ;
 	float step <- 10 #sec;
 	int nb_people <- 1000;
@@ -354,8 +354,10 @@ experiment CityScopeKeystone type: gui {
 	float minimum_cycle_duration <- 0.02;
 	output {
 		
-		display CityScope  type:opengl background:#black keystone:true fullscreen:1{
-			species table aspect:base;
+		display CityScope  type:opengl background:#black keystone:true
+		camera_pos: {3501.0578391480585,3695.2849389914577,5398.2276587887345} camera_look_pos: {3501.0578391480585,3685.8641167098763,0.4995766419042543} camera_up_vector: {-6.123224669520431E-17,0.9999984769132878,0.0017453283658381805}
+		{
+		    species table aspect:base;
 			species building aspect: base refresh:false position:{0,0,-0.001};
 			//species road aspect: base refresh:false;
 			species amenity aspect: base ;
