@@ -319,6 +319,7 @@ experiment CityScope type: gui {
 	float minimum_cycle_duration <- 0.02;
 	output {
 		
+		display CityScope  type:opengl background:#black keystone:true synchronized:false {
 			species table aspect:base;
 			species building aspect: base refresh:false position:{0,0,-0.001};
 			//species road aspect: base refresh:false;
