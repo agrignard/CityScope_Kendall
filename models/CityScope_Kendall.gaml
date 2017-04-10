@@ -20,7 +20,7 @@ global {
 	float step <- 10 #sec;
 	int nb_people <- 1000;
 	int current_hour update: (time / #hour) mod 24 ;
-	int min_work_start <- 5;
+	int min_work_start <-4 ;
 	int max_work_start <- 10;
 	int min_lunch_start <- 11;
 	int max_lunch_start <- 13;
@@ -58,7 +58,7 @@ global {
 	int distance parameter: 'distance ' category: "Visualization" min: 1 <- 100#m;	
 	bool drawInteraction <- false parameter: "Draw Interaction:" category: "Visualization";
 	int scenario <-3 parameter: "Scenario:" category: "Experiment" min:1 max:3 ;
-	bool onlineGrid <-true parameter: "Online Grid:" category: "Environment";
+	bool onlineGrid <-false parameter: "Online Grid:" category: "Environment";
 	bool dynamicGrid <-false parameter: "Update Grid:" category: "Environment";
 	int refresh <- 100 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Environment";
 	
@@ -306,7 +306,7 @@ species amenity {
 }
 
 experiment CityScope type: gui {	
-	float minimum_cycle_duration <- 0.01;
+	float minimum_cycle_duration <- 0.02;
 	output {
 		
 		display CityScope  type:opengl background:#black keystone:true synchronized:false{
@@ -319,8 +319,8 @@ experiment CityScope type: gui {
                //draw square(100) color:#blue at: { 5000, 5200};   draw "$" color: # white font: font("Helvetica", 20, #bold) at: { 5075, 5250};
                //draw square(100) color:#yellow at: { 5300, 5200};   draw "$$" color: # white font: font("Helvetica", 20, #bold) at: { 5375, 5250};
                //draw square(100) color:#red at: { 5600, 5200};   draw "$$$" color: # white font: font("Helvetica", 20, #bold) at: { 5675, 5250};
-               draw string(current_hour) + "h" color: # white font: font("Helvetica", 30, #italic) at: { 5000, 5000};
-               draw "1000 people "color: # white font: font("Helvetica", 25, #italic) at: { 5000, 5300};
+               draw string(current_hour) + "h" color: # white font: font("Helvetica", 25, #italic) at: { 5700, 6200};
+              // draw "1000 people "color: # white font: font("Helvetica", 25, #italic) at: { 5000, 5300};
                draw imageRaster size:40#px at: { 7000, 6000};
             }
            
