@@ -16,6 +16,8 @@ global {
 	file roads_shapefile <- file("../includes/Roads.shp");
 	file amenities_shapefile <- file("../includes/Amenities.shp");
 	file amenities_volpe_shapefile <- file("../includes/volpe_amenities.shp");
+	file my_csv_file <- csv_file("../includes/mobility/pp.csv",",");
+	matrix data <- matrix(my_csv_file);
 	geometry shape <- envelope(bound_shapefile);
 	file imageRaster <- file('../images/gama_black.png') ;
 	float step <- 10 #sec;
@@ -111,7 +113,15 @@ global {
 			/*if (flip(0.1)){
 				moveOnRoad <-false;
 			}*/	
-		}			
+		}	
+		
+	  	
+	  	loop i from: 1 to: data.rows -1{
+	  		create mobileData{
+	  			location <- point(to_GAMA_CRS({ float(data[6,i]), float(data[7,i]) }, "WGS_1984"));
+	  		}	
+		}
+	  	 	
 	}
 	
 	
@@ -191,6 +201,13 @@ species building schedules: []{
 }
 
 species road  schedules: []{
+	rgb color <- #red ;
+	aspect base {
+		draw shape color: rgb(125,125,125) ;
+	}
+}
+
+species mobileData {
 	rgb color <- #red ;
 	aspect base {
 		draw shape color: rgb(125,125,125) ;
@@ -310,7 +327,7 @@ species amenity {
 
 species table{
 	aspect base {
-		draw shape empty:true border:#green color: #green ;
+		draw shape empty:false border:#green color: #green ;
 	}	
 }
 
@@ -325,26 +342,6 @@ experiment CityScope type: gui {
 			//species road aspect: base refresh:false;
 			species amenity aspect: base ;
 			species people aspect: dynamic;
-			graphics "text" 
-			{
-               //draw square(100) color:#blue at: { 5000, 5200};   draw "$" color: # white font: font("Helvetica", 20, #bold) at: { 5075, 5250};
-               //draw square(100) color:#yellow at: { 5300, 5200};   draw "$$" color: # white font: font("Helvetica", 20, #bold) at: { 5375, 5250};
-               //draw square(100) color:#red at: { 5600, 5200};   draw "$$$" color: # white font: font("Helvetica", 20, #bold) at: { 5675, 5250};
-               draw string(current_hour) + "h" color: # white font: font("Helvetica", 25, #italic) at: { 5700, 6200};
-              // draw "1000 people "color: # white font: font("Helvetica", 25, #italic) at: { 5000, 5300};
-               draw imageRaster size:40#px at: { 7000, 6000};
-            }
-           
-            	graphics "edges" {
-		      //Creation of the edges of adjacence
-				if (my_graph != nil  and drawInteraction = true ) {
-					loop eg over: my_graph.edges {
-						geometry edge_geom <- geometry(eg);
-						float val <- 255 * edge_geom.perimeter / distance; 
-						draw line(edge_geom.points)  color: rgb(75,75,75);
-					}
-				}	
-			}	
 		}
 	}
 }
@@ -352,14 +349,16 @@ experiment CityScope type: gui {
 
 experiment CityScopeKeystone type: gui {	
 	float minimum_cycle_duration <- 0.02;
-	output {
-		
-		display CityScope  type:opengl background:#black keystone:true fullscreen:1 keystone: [{-0.37839248434237976,-0.7193308550185875,0.0},{-1.0276617954070937,1.4851301115241462,0.0},{1.9629436325678091,2.3810408921932744,0.0},{1.783402922755734,-0.38197026022305125,0.0}]{
-		    species table aspect:base;
+	output {	
+		display CityScope  type:opengl background:#black keystone:true synchronized:false rotate:180
+		camera_pos: {4463.617380353552,3032.955173460968,4033.5415243977554} camera_look_pos: {4464.718608885005,3026.0022901525017,0.1794988227075576} camera_up_vector: {0.15643422677690633,0.9876868362601618,0.0017453283655837362}
+		{
+			//species table aspect:base;
 			species building aspect: base refresh:false position:{0,0,-0.001};
 			species road aspect: base refresh:false;
 			species amenity aspect: base ;
 			species people aspect: dynamic;
+			species mobileData aspect:base;
 			graphics "text" 
 			{
                //draw square(100) color:#blue at: { 5000, 5200};   draw "$" color: # white font: font("Helvetica", 20, #bold) at: { 5075, 5250};
