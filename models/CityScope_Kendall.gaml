@@ -129,7 +129,8 @@ global {
 		      create amenity {
 				  location <- {	2800 + (13-l["x"])*world.shape.width*0.01,	2800+ l["y"]*world.shape.height*0.01};
 				  shape <- square(60) at_location location;
-				  type <- "grid";
+				  category<-rnd(2);	
+				  type <- one_of(amenity_type);
 				  fromGrid<-true;
 				 // 
 				  //LARGE
@@ -286,7 +287,7 @@ species people skills:[moving]{
 	}
 	
 	aspect dynamic {
-		draw circle(14) color: category_color[category];
+		draw circle(20) color: category_color[category];
 	}
 }
 
