@@ -10,20 +10,18 @@
 model CityScope_Kendall
 
 global {
-	file table_bound_shapefile <- file("../includes/table_bounds.shp");
+	// GIS FILE //	
 	file bound_shapefile <- file("../includes/Bounds.shp");
 	file buildings_shapefile <- file("../includes/Buildings.shp");
 	file roads_shapefile <- file("../includes/Roads.shp");
 	file amenities_shapefile <- file("../includes/Amenities.shp");
-	file amenities_volpe_shapefile <- file("../includes/volpe_amenities.shp");
-	file my_csv_file <- csv_file("../includes/mobility/pp.csv",",");
-	matrix data <- matrix(my_csv_file);
-	geometry shape <- envelope(bound_shapefile);
+	file table_bound_shapefile <- file("../includes/table_bounds.shp");
 	file imageRaster <- file('../images/gama_black.png') ;
+	geometry shape <- envelope(bound_shapefile);
+	
 	float step <- 10 #sec;
 	int nb_people <- 500;
-	int current_hour update: 6+ (time / #hour) mod 24 ;
-	list<int> hourDistribution <-[4,10,11,13,14,16,18,20,21,22];
+	int current_hour update: (time / #hour) mod 24 ;
 	int min_work_start <-4 ;
 	int max_work_start <- 10;
 	int min_lunch_start <- 11;
@@ -39,22 +37,21 @@ global {
 	graph the_graph;
 	
 	//////////// GRID //////////////
-	map<string, unknown> matrixData;
-    map<int,rgb> buildingColors <-[0::rgb(14,106,187), 1::rgb(14,106,187), 2::rgb(224,185,68),3::rgb(224,185,68), 4::rgb(187,26,14), 5::rgb(187,26,14),6::rgb(40,40,40)];
-    list<map<string, int>> legos;
+	map<string, unknown> cityMatrixData;
+	list<map<string, int>> cityMatrixCell;
 	list<float> density_array;
-	
 		
 	//////// AMENITIES  ///////////
 	map<string,list> amenities_map_settings<- ["arts_centre"::[rgb(255,255,255),triangle(50)], "bar"::[rgb(255,0,0),square(50)], "cafe"::[rgb(255,125,0),square(50)], "cinema"::[rgb(225,225,225),triangle(50)], 
 	"fast_food"::[rgb(255,255,0),square(50)] ,"market_place"::[rgb(0,255,0),square(75)] , "music_club"::[rgb(255,105,180),hexagon(50)], "nightclub"::[rgb(255,182,193),hexagon(50)],
 	 "pub"::[rgb(255,99,71),square(50)], "restaurant"::[rgb(255,215,0),square(50)], "theatre"::[rgb(255,255,255),triangle(50)]];
-	 	 
-	list category_color<- [rgb(14,106,187), rgb(224,185,68), rgb(187,26,14)];
-	list amenity_type <-["arts_centre", "bar", "cafe", "cinema","fast_food","market_place","music_club","night_club","pub","restaurant","theatre"]; 
+	list amenity_type <-["arts_centre", "bar", "cafe", "cinema","fast_food","market_place","music_club","night_club","pub","restaurant","theatre"];
+	list category_color<- [rgb(14,106,187), rgb(224,185,68), rgb(187,26,14)]; 
 	
 	// MOBILE DATA //
 	float lenghtMax <-0;
+	file my_csv_file <- csv_file("../includes/mobility/pp.csv",",");
+	matrix data <- matrix(my_csv_file);
 	 
 	//INTERACTION GRAPH 
 	graph my_graph;
@@ -65,7 +62,8 @@ global {
 	int distance parameter: 'distance ' category: "Visualization" min: 1 <- 100#m;	
 	bool drawInteraction <- false parameter: "Draw Interaction:" category: "Visualization";
 	bool onlineGrid <-true parameter: "Online Grid:" category: "Environment";
-	bool dynamicGrid <-true parameter: "Update Grid:" category: "Environment";
+	bool dynamicGrid <-false parameter: "Update Grid:" category: "Environment";
+	bool realAmenity <-false parameter: "Real Amenities:" category: "Environment";
 	int refresh <- 100 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Environment";
 	
 	init {
@@ -76,23 +74,17 @@ global {
 		the_graph <- as_edge_graph(road);
 		
 		create table from: table_bound_shapefile;
-		
-		//FROM FILE
-	      create amenity from: amenities_shapefile with: [type::string(read ("amenity"))]{
-			color <- rgb(amenities_map_settings[type][0]);
-			shape <- geometry(amenities_map_settings[type][1]) at_location location;
-			category<-rnd(2);	
-			fromGrid<-false;
+        
+        if(realAmenity){
+          create amenity from: amenities_shapefile with: [type::string(read ("amenity"))]{
+	        color <- rgb(amenities_map_settings[type][0]);
+		    shape <- geometry(amenities_map_settings[type][1]) at_location location;
+		    category<-rnd(2);	
+		    fromGrid<-false;
 		  }		
-	
-	      create amenity from: amenities_volpe_shapefile with: [type::string(read ("amenity"))]{
-			color <- rgb(amenities_map_settings[type][0]);
-			shape <- geometry(amenities_map_settings[type][1]) at_location location;
-			category<-rnd(2);
-			fromGrid<-false;		
-		  }
-
-		  do initGrid;
+        }
+	    	
+		do initGrid;
 		
 		
 		create people number: nb_people {
@@ -110,64 +102,52 @@ global {
 			dining_place <- one_of(amenity where ((each.type="arts_centre" or each.type="theatre" or each.type="bar"))) ;
 			objective <- "resting";
 			location <- any_location_in (living_place); 
-			/*if (flip(0.1)){
+			if (flip(0.1)){
 				moveOnRoad <-false;
-			}*/	
-		}
-		
-		/*loop i from: 1 to: data.rows -1{
-	  		create mobileData{
-	  			location <- point(to_GAMA_CRS({ float(data[6,i]), float(data[7,i]) }, "EPSG:4326"));
-	  			lenght<-float(data[4,i]);
-	  			if (lenght > lenghtMax){
-	  				lenghtMax <- lenght;
-	  			}
-	  		}	
-		}*/	
+			}
+		}	
 	}
 	
 	
 	
   action initGrid{
-  		ask amenity{
-  			//do die;
+  		ask amenity where (each.fromGrid=true){
+  			do die;
   		}
 		if(onlineGrid = true){
-		  matrixData <- json_file("http://45.55.73.103/table/citymatrix_volpe").contents;
+		  cityMatrixData <- json_file("http://45.55.73.103/table/citymatrix_volpe").contents;
 	    }
 	    else{
-	      matrixData <- json_file("../includes/cityIO_Kendall.json").contents;
+	      cityMatrixData <- json_file("../includes/cityIO_Kendall.json").contents;
 	    }	
-		legos <- matrixData["grid"];
-		density_array <- matrixData["objects"]["density"];
+		cityMatrixCell <- cityMatrixData["grid"];
+		density_array <- cityMatrixData["objects"]["density"];
 		write density_array;
-		loop l over: legos { 
-			int id <-int(l["type"]);
-			
+		loop l over: cityMatrixCell { 
+			int id <-int(l["type"]);	
 			if(id != -1 and id != -2)   {
 		      create amenity {
 				  location <- {	2800 + (13-l["x"])*world.shape.width*0.01,	2800+ l["y"]*world.shape.height*0.01};
-				  //color <-buildingColors[id];
 				  shape <- square(60) at_location location;
-				  type <- one_of(amenity_type);
+				  type <- "grid";
 				  fromGrid<-true;
 				 // 
 				  //LARGE
 				  if(id=0 or id =3){
 				  	category <-0;
-				  	color<-#red;
+				  	color<-category_color[2];
 				  	density <-density_array[id];
 				  }
 				  //MEDIUM
 				  if(id=1 or id =4){
 				  	category <-1;
-				  	color<-#yellow;
+				  	color<-category_color[1];
 				  	density <-density_array[id];
 				  }
 				  
 				  if(id=2 or id =5){
 				  	category <-2;
-				  	color<-#blue;
+				  	color<-category_color[0];
 				  	density <-density_array[id];
 				  }
 				 	
@@ -194,6 +174,15 @@ global {
 			}
 		}
 	}
+	
+	 action initMobileData{
+       loop i from: 1 to: data.rows -1{
+	     create mobileData{
+	  	   location <- point(to_GAMA_CRS({ float(data[6,i]), float(data[7,i]) }, "EPSG:4326"));
+		   lenght<-float(data[4,i]);
+		 }	
+	   }
+	 }
 }
 
 species building schedules: []{
@@ -336,12 +325,17 @@ experiment CityScope type: gui {
 	float minimum_cycle_duration <- 0.02;
 	output {
 		
-		display CityScope  type:opengl background:#black keystone:true synchronized:false {
+		display CityScope  type:opengl background:#black {
 			species table aspect:base;
 			species building aspect: base refresh:false position:{0,0,-0.001};
 			species road aspect: base refresh:false;
 			species amenity aspect: base ;
 			species people aspect: dynamic;
+			graphics "text" 
+			{
+               draw string(current_hour) + "h" color: # white font: font("Helvetica", 25, #italic) at: { 5700, 6200};
+               draw imageRaster size:40#px at: { 7000, 6000};
+            }
 		}
 	}
 }
