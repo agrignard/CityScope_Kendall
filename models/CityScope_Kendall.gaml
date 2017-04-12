@@ -198,7 +198,7 @@ species building schedules: []{
 species road  schedules: []{
 	rgb color <- #red ;
 	aspect base {
-		draw shape color: rgb(125,125,125) ;
+		draw shape color: rgb(125,125,125,75) ;
 	}
 }
 
@@ -286,7 +286,7 @@ species people skills:[moving]{
 	}
 	
 	aspect dynamic {
-		draw circle(10) color: category_color[category];
+		draw circle(14) color: category_color[category];
 	}
 }
 
@@ -308,7 +308,7 @@ species amenity schedules:[]{
 
 species table{
 	aspect base {
-		draw shape empty:true border:#white color: #white ;
+		draw shape empty:true border:rgb(125,125,125,75) color: rgb(125,125,125,75) ;
 	}	
 }
 
