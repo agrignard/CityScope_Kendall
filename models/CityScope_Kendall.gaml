@@ -35,6 +35,7 @@ global {
 	float min_speed <- 4 #km / #h;
 	float max_speed <- 6 #km / #h; 
 	graph the_graph;
+	float angle <--9.74;
 	
 	//////////// GRID //////////////
 	map<string, unknown> cityMatrixData;
@@ -64,7 +65,7 @@ global {
 	bool onlineGrid <-true parameter: "Online Grid:" category: "Environment";
 	bool dynamicGrid <-false parameter: "Update Grid:" category: "Environment";
 	bool realAmenity <-false parameter: "Real Amenities:" category: "Environment";
-	int refresh <- 100 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Environment";
+	int refresh <- 1000 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Environment";
 	
 	init {
 		create building from: buildings_shapefile with: [type::string(read ("TYPE"))]{
@@ -124,8 +125,8 @@ global {
 		write length(cityMatrixCell);
 		density_array <- cityMatrixData["objects"]["density"];
 		write density_array;
-		float angle <--9.74;
-		point center <-{3250,2130};
+		
+		point center <-{3305,2075};
 		loop l over: cityMatrixCell { 
 	
 			/*create amenity {
@@ -144,7 +145,7 @@ global {
 		      	  x<-l["x"];
 		      	  y<-l["y"];
 				  //location <- {	center.x + (13-l["x"])*world.shape.width*0.01,	center.y+ l["y"]*world.shape.height*0.01};  
-				  location <- {	center.x + (13-l["x"])*world.shape.width*0.01,	center.y+ l["y"]*world.shape.height*0.01};  
+				  location <- {	center.x + (13-l["x"])*world.shape.width*0.00942,	center.y+ l["y"]*world.shape.height*0.0113};  
 				  location<- {(location.x * cos(angle) + location.y * sin(angle)),-location.x * sin(angle) + location.y * cos(angle)};
 				  shape <- square(60) at_location location;
 				 // category<-rnd(2);	
@@ -343,7 +344,7 @@ species amenity schedules:[]{
 		pop <-length(people overlapping self.shape);
 	}
 	aspect base {
-		draw shape rotated_by 9.74 color: rgb(color.red, color.green, color.blue,75);//depth:pop*10;	
+		draw shape rotated_by -angle color: rgb(color.red, color.green, color.blue,75);//depth:pop*10;	
 	}
 }
 
@@ -387,6 +388,7 @@ experiment CityScopeVolpeDemo type: gui {
 	output {
 		
 		display CityScope  type:opengl background:#black {
+			species table aspect:base;
 			species building aspect: base refresh:false position:{0,0,-0.001};
 			species road aspect: base refresh:false;
 			species amenity aspect: base ;
