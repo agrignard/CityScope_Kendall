@@ -115,24 +115,48 @@ global {
   			do die;
   		}
 		if(onlineGrid = true){
-		  cityMatrixData <- json_file("http://45.55.73.103/table/citymatrix_volpe").contents;
+		  cityMatrixData <- json_file("https://cityio.media.mit.edu/table/citymatrix_volpe").contents;
 	    }
 	    else{
 	      cityMatrixData <- json_file("../includes/cityIO_Kendall.json").contents;
 	    }	
 		cityMatrixCell <- cityMatrixData["grid"];
+		write length(cityMatrixCell);
 		density_array <- cityMatrixData["objects"]["density"];
 		write density_array;
+		float angle <--9.74;
+		point center <-{3250,2130};
 		loop l over: cityMatrixCell { 
-			int id <-int(l["type"]);	
-			if(id != -1 and id != -2)   {
-		      create amenity {
-				  location <- {	2800 + (13-l["x"])*world.shape.width*0.01,	2800+ l["y"]*world.shape.height*0.01};
+	
+			/*create amenity {
+				location <- {	center.x + (13-l["x"])*world.shape.width*0.01,	center.y+ l["y"]*world.shape.height*0.01};  
+				  location<- {(location.x * cos(angle) + location.y * sin(angle)),-location.x * sin(angle) + location.y * cos(angle)};
 				  shape <- square(60) at_location location;
-				  category<-rnd(2);	
 				  type <- one_of(amenity_type);
 				  fromGrid<-true;
+				  category <-0;
+				  color<-#white;
+		
+			}*/	
+			//if(id != -1 and id != -2)   {
+		      create amenity {
+		      	  id <-int(l["type"]);
+		      	  x<-l["x"];
+		      	  y<-l["y"];
+				  //location <- {	center.x + (13-l["x"])*world.shape.width*0.01,	center.y+ l["y"]*world.shape.height*0.01};  
+				  location <- {	center.x + (13-l["x"])*world.shape.width*0.01,	center.y+ l["y"]*world.shape.height*0.01};  
+				  location<- {(location.x * cos(angle) + location.y * sin(angle)),-location.x * sin(angle) + location.y * cos(angle)};
+				  shape <- square(60) at_location location;
+				 // category<-rnd(2);	
+				  type <- one_of(amenity_type);
+				  fromGrid<-true;
+				  //category<-4;
+				  //color <-#white;
 				 // 
+				  if(id=-1){
+				  	category <-4;
+				  	color<-#green;
+				  }
 				  //LARGE
 				  if(id=0 or id =3){
 				  	category <-0;
@@ -151,9 +175,13 @@ global {
 				  	color<-category_color[0];
 				  	density <-density_array[id];
 				  }
+				  if(id=6){
+				  	category <-4;
+				  	color<-#gray;
+				  }
 				 	
               }				
-			}              
+			//}             
         }
 	}
 	
@@ -301,18 +329,21 @@ species people skills:[moving]{
 }
 
 species amenity schedules:[]{
+	int id;
 	string type;
 	int category;
 	bool fromGrid;
 	float density <-0.0;
 	int pop;
 	rgb color;
+	int x;
+	int y;
 	
 	reflex countPeople{
 		pop <-length(people overlapping self.shape);
 	}
 	aspect base {
-		draw shape color: rgb(color.red, color.green, color.blue,75);//depth:pop*10;	
+		draw shape rotated_by 9.74 color: rgb(color.red, color.green, color.blue,75);//depth:pop*10;	
 	}
 }
 
