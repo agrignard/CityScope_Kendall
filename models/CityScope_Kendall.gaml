@@ -188,11 +188,16 @@ global {
 
 species building schedules: []{
 	string type;
+	string usage;
 	rgb color <- #gray  ;
 	float depth;
 	
 	aspect base {	
      	draw shape color: rgb(50,50,50,125);// depth:depth*shape.area*0.00005;	
+	}
+	
+	aspect landuse{
+		
 	}
 }
 
@@ -289,6 +294,10 @@ species people skills:[moving]{
 	aspect dynamic {
 		draw circle(20) color: category_color[category];
 	}
+	
+	aspect dynamicTable {
+		draw circle(5) color: category_color[category];
+	}
 }
 
 species amenity schedules:[]{
@@ -322,7 +331,7 @@ species mobileData schedules:[]{
 }
 
 
-experiment CityScope type: gui {	
+experiment CityScopeDev type: gui {	
 	float minimum_cycle_duration <- 0.02;
 	output {
 		
@@ -342,26 +351,34 @@ experiment CityScope type: gui {
 }
 
 
-experiment CityScopeKeystone type: gui {	
+experiment CityScopeVolpeDemo type: gui {	
 	float minimum_cycle_duration <- 0.02;
-	output {	
-		display CityScope  type:opengl background:#black{
-	    /*rotate:180
-		camera_pos: {4463.617380353552,3032.955173460968,4033.5415243977554} 
-		camera_look_pos: {4464.718608885005,3026.0022901525017,0.1794988227075576} 
-		camera_up_vector: {0.15643422677690633,0.9876868362601618,0.0017453283655837362}{*/
+	output {
 		
-			species table aspect:base;
+		display CityScope  type:opengl background:#black {
 			species building aspect: base refresh:false position:{0,0,-0.001};
 			species road aspect: base refresh:false;
 			species amenity aspect: base ;
 			species people aspect: dynamic;
-			species mobileData aspect:base;
 			graphics "text" 
 			{
                draw string(current_hour) + "h" color: # white font: font("Helvetica", 25, #italic) at: { 5700, 6200};
                draw imageRaster size:40#px at: { 7000, 6000};
             }
+		}
+			
+		display CityScopeTable  type:opengl background:#black
+	    fullscreen:0
+	    rotate:180
+		camera_pos: {4463.617380353552,3032.955173460968,4033.5415243977554} 
+		camera_look_pos: {4464.718608885005,3026.0022901525017,0.1794988227075576} 
+		camera_up_vector: {0.15643422677690633,0.9876868362601618,0.0017453283655837362}{
+			species building aspect: base refresh:false position:{0,0,-0.001};
+			species road aspect: base refresh:false;
+			species amenity aspect: base ;
+			species people aspect: dynamicTable;
+			species mobileData aspect:base;
+
            
             graphics "edges" {
 		      //Creation of the edges of adjacence
