@@ -368,16 +368,16 @@ experiment CityScopeVolpeDemo type: gui {
 		}
 			
 		display CityScopeTable  type:opengl background:#black
-	    fullscreen:0
+	    fullscreen:2
 	    rotate:180
 		camera_pos: {4463.617380353552,3032.955173460968,4033.5415243977554} 
 		camera_look_pos: {4464.718608885005,3026.0022901525017,0.1794988227075576} 
 		camera_up_vector: {0.15643422677690633,0.9876868362601618,0.0017453283655837362}{
-			species building aspect: base refresh:false position:{0,0,-0.001};
-			species road aspect: base refresh:false;
+			//species building aspect: base refresh:false position:{0,0,-0.001};
+			//species road aspect: base refresh:false;
 			species amenity aspect: base ;
 			species people aspect: dynamicTable;
-			species mobileData aspect:base;
+			//species mobileData aspect:base;
 
            
             graphics "edges" {
