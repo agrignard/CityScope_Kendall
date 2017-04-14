@@ -47,8 +47,9 @@ global {
 	"fast_food"::[rgb(255,255,0),square(50)] ,"market_place"::[rgb(0,255,0),square(75)] , "music_club"::[rgb(255,105,180),hexagon(50)], "nightclub"::[rgb(255,182,193),hexagon(50)],
 	 "pub"::[rgb(255,99,71),square(50)], "restaurant"::[rgb(255,215,0),square(50)], "theatre"::[rgb(255,255,255),triangle(50)]];
 	list amenity_type <-["arts_centre", "bar", "cafe", "cinema","fast_food","market_place","music_club","night_club","pub","restaurant","theatre"];
-	list category_color<- [rgb(14,106,187), rgb(224,185,68), rgb(187,26,14)]; 
-	
+	//list category_color<- [rgb(14,106,187), rgb(224,185,68), rgb(187,26,14)]; 
+	list category_color<- [#gamablue, #gamaorange, #gamared];
+	list category_string<- ["S", "M", "L"]; 
 	// MOBILE DATA //
 	float lenghtMax <-0;
 	file my_csv_file <- csv_file("../includes/mobility/pp.csv",",");
@@ -69,9 +70,15 @@ global {
 	
 	init {
 		create building from: buildings_shapefile with: [type::string(read ("TYPE")),usage::string(read ("Usage")),scale::string(read ("Scale"))]{
-			write usage;
-			write scale;
-			type <- (location.x < world.shape.width*0.4  and location.y > world.shape.height*0.6) ? "Industrial" : "Residential";
+			
+			if(usage = "R"){
+				type<-"Residential";
+			}
+			if(usage = "O"){
+				type<-"Industrial";
+			}
+			
+			//type <- (location.x < world.shape.width*0.4  and location.y > world.shape.height*0.6) ? "Industrial" : "Residential";
 		}	
 		create road from: roads_shapefile ;
 		the_graph <- as_edge_graph(road);
@@ -98,10 +105,11 @@ global {
 			time_to_rework <- min_rework_start + rnd (max_rework_start - min_rework_start) ;
 			time_to_dinner <- min_dinner_start + rnd (max_dinner_start - min_dinner_start) ;
 			time_to_sleep <- min_work_end + rnd (max_work_end - min_work_end) ;
-			category<-rnd(2);			
-			living_place <- one_of(building where (each.type="Residential")) ;
-			working_place <- one_of(building  where (each.type="Industrial")) ;
-			eating_place <- one_of(amenity where (each.category=category and (each.type="fast_food" or each.type="restaurant" or each.type="cafe"))) ;
+			category<-rnd(2);
+			scale<-category_string[rnd(2)];			
+			living_place <- one_of(building where (each.type="Residential" and each.scale=scale)) ;
+			working_place <- one_of(building  where (each.type="Industrial" and each.scale=scale)) ;
+			eating_place <- one_of(amenity where (each.scale=scale and (each.type="fast_food" or each.type="restaurant" or each.type="cafe"))) ;
 			dining_place <- one_of(amenity where ((each.type="arts_centre" or each.type="theatre" or each.type="bar"))) ;
 			objective <- "resting";
 			location <- any_location_in (living_place); 
@@ -163,18 +171,21 @@ global {
 				  //LARGE
 				  if(id=0 or id =3){
 				  	category <-0;
+				  	scale<-"L";
 				  	color<-category_color[2];
 				  	density <-density_array[id];
 				  }
 				  //MEDIUM
 				  if(id=1 or id =4){
 				  	category <-1;
+				  	scale<-"M";
 				  	color<-category_color[1];
 				  	density <-density_array[id];
 				  }
 				  
 				  if(id=2 or id =5){
 				  	category <-2;
+				  	scale<-"S";
 				  	color<-category_color[0];
 				  	density <-density_array[id];
 				  }
@@ -227,7 +238,28 @@ species building schedules: []{
 	aspect base {	
      	draw shape color: rgb(50,50,50,125);// depth:depth*shape.area*0.00005;	
 	}
-	
+	aspect usage{
+		if (usage = "R")
+		{
+		  draw shape color: #white;
+		}else{
+		  draw shape color: #gray;	
+		}
+	}
+	aspect scale{
+		if (scale = "S")
+		{
+		  draw shape color: #gamablue;
+		}
+		if (scale = "M")
+		{
+		  draw shape color: #gamaorange;
+		}
+		if (scale = "L")
+		{
+		  draw shape color: #gamared;
+		}
+	}
 	aspect landuse{
 		
 	}
@@ -254,7 +286,9 @@ species people skills:[moving]{
 	int time_to_sleep;
 	string objective ;
 	string curMovingMode<-"travelling";	
-	int category; 
+	int category;
+	string scale;
+	string usage; 
 	point the_target <- nil ;
 	int degree;
 	float radius;
@@ -303,9 +337,9 @@ species people skills:[moving]{
 		
 		if (the_target = location) {
 			the_target <- nil ;
-			if(objective = "eating" or objective = "dinning"){
+			//if(objective = "eating" or objective = "dinning"){
 				curMovingMode <- "wandering";
-			}
+			//}
 			
 		}
 		if(curMovingMode = "wandering"){
@@ -330,12 +364,28 @@ species people skills:[moving]{
 	aspect dynamicTable {
 		draw circle(5) color: category_color[category];
 	}
+	aspect scale{
+		if (scale = "S")
+		{
+		  draw circle(20) color: #gamablue;
+		}
+		if (scale = "M")
+		{
+		  draw circle(20) color: #gamaorange;
+		}
+		if (scale = "L")
+		{
+		  draw circle(20) color: #gamared;
+		}
+	}
 }
 
 species amenity schedules:[]{
 	int id;
 	string type;
 	int category;
+	string usage;
+	string scale;
 	bool fromGrid;
 	float density <-0.0;
 	int pop;
@@ -372,10 +422,10 @@ experiment CityScopeDev type: gui {
 		
 		display CityScope  type:opengl background:#black {
 			species table aspect:base;
-			species building aspect: base refresh:false position:{0,0,-0.001};
+			//species building aspect: scale refresh:false position:{0,0,-0.001};
 			species road aspect: base refresh:false;
 			species amenity aspect: base ;
-			species people aspect: dynamic;
+			species people aspect: scale;
 			graphics "text" 
 			{
                draw string(current_hour) + "h" color: # white font: font("Helvetica", 25, #italic) at: { 5700, 6200};
@@ -395,7 +445,7 @@ experiment CityScopeVolpeDemo type: gui {
 			species building aspect: base refresh:false position:{0,0,-0.001};
 			species road aspect: base refresh:false;
 			species amenity aspect: base ;
-			species people aspect: dynamic;
+			species people aspect: scale;
 			graphics "text" 
 			{
                draw string(current_hour) + "h" color: # white font: font("Helvetica", 25, #italic) at: { 5700, 6200};
@@ -412,7 +462,7 @@ experiment CityScopeVolpeDemo type: gui {
 			//species building aspect: base refresh:false position:{0,0,-0.001};
 			//species road aspect: base refresh:false;
 			species amenity aspect: base ;
-			species people aspect: dynamicTable;
+			species people aspect: scale;
 			//species mobileData aspect:base;
 
            
