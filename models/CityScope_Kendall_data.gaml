@@ -116,7 +116,6 @@ global {
 				}
 			}				
 		}
-		
 	}
 	
 	
@@ -159,13 +158,13 @@ global {
 				  if(id=7){
 				  	color<-#pink;
 				  }	
-              }	
-              ask amenity{
-              	if (x = 0 and y = 0){
-              		do die;
-              	}
-              }			        
+              }	        
         }
+        ask amenity{
+          if (x = 0 and y = 0){
+            do die;
+          }
+        }	
 	}
 	
 	reflex updateGrid when: ((cycle mod refresh) = 0) and (dynamicGrid = true){	
