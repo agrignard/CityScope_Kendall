@@ -42,6 +42,7 @@ global {
 	list<map<string, int>> cityMatrixCell;
 	list<float> density_array;
 	map<int,list> citymatrix_map_settings<- [0::["R","L"],1::["R","M"],2::["R","S"],3::["O","L"],4::["O","M"],5::["O","S"]];
+	int toggle1;
 		
 	//////// AMENITIES  ///////////
 	map<string,list> amenities_map_settings<- ["arts_centre"::[rgb(255,255,255),triangle(50)], "bar"::[rgb(255,0,0),square(50)], "cafe"::[rgb(255,125,0),square(50)], "cinema"::[rgb(225,225,225),triangle(50)], 
@@ -131,7 +132,8 @@ global {
 	      cityMatrixData <- json_file("../includes/cityIO_Kendall.json").contents;
 	    }	
 		cityMatrixCell <- cityMatrixData["grid"];
-		density_array <- cityMatrixData["objects"]["density"];		
+		density_array <- cityMatrixData["objects"]["density"];
+		toggle1 <- cityMatrixData["objects"]["toggle1"];		
 		point center <-{3305,2075};
 		loop l over: cityMatrixCell { 
 		      create amenity {
@@ -316,7 +318,9 @@ species people skills:[moving]{
 	}
 	
 	aspect scaleTable{
-      draw circle(4) color: scale_color[scale];
+		if(toggle1 = 0 or toggle1 = 1 or toggle1 = 2){
+			draw circle(4) color: scale_color[scale];
+		}   
 	}
 }
 
