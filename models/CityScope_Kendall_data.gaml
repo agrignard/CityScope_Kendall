@@ -68,9 +68,9 @@ global {
 	int distance parameter: 'distance ' category: "Visualization" min: 1 <- 100#m;	
 	bool drawInteraction <- false parameter: "Draw Interaction:" category: "Visualization";
 	bool onlineGrid <-true parameter: "Online Grid:" category: "Environment";
-	bool dynamicGrid <-false parameter: "Update Grid:" category: "Environment";
+	bool dynamicGrid <-true parameter: "Update Grid:" category: "Environment";
 	bool realAmenity <-false parameter: "Real Amenities:" category: "Environment";
-	int refresh <- 1000 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Environment";
+	int refresh <- 50 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Environment";
 	
 	init {
 		create building from: buildings_shapefile with: [usage::string(read ("Usage")),scale::string(read ("Scale"))];
@@ -174,7 +174,7 @@ global {
 	}
 	
 	
-    reflex updateDegreeMax when:(drawInteraction=true){
+    reflex updateDegreeMax when:(drawInteraction=true or toggle1=6){
 		do degreeMax_computation;
 	}
 
@@ -297,7 +297,7 @@ species people skills:[moving]{
 		}
 	}
 	
-	reflex compute_degree when:(drawInteraction=true){
+	reflex compute_degree when:(drawInteraction=true or toggle1=6){
 		degree <- my_graph = nil ? 0 : (my_graph) degree_of (self);
 		radius <- ((((degree + 1) ^ 1.4) / (degreeMax))) * 5;
 		color <- hsb(0.66,degree / (degreeMax + 1), 0.5);
@@ -314,11 +314,11 @@ species people skills:[moving]{
 		draw circle(5) color: scale_color[scale];
 	}
 	aspect scale{
-      draw circle(20) color: scale_color[scale];
+      draw circle(14) color: scale_color[scale];
 	}
 	
 	aspect scaleTable{
-		if(toggle1 = 0 or toggle1 = 1 or toggle1 = 2){
+		if(toggle1 = 0 or toggle1 = 1 or toggle1 = 6 or toggle1 = 9){
 			draw circle(4) color: scale_color[scale];
 		}   
 	}
@@ -392,8 +392,8 @@ experiment CityScopeVolpeDemo type: gui {
 	output {
 		
 		display CityScope  type:opengl background:#black {
-			species table aspect:base;
-			species building aspect: base refresh:false position:{0,0,-0.001};
+			//species table aspect:base;
+			//species building aspect: scale refresh:false position:{0,0,-0.001};
 			species road aspect: base refresh:false;
 			species amenity aspect: base ;
 			species people aspect: scale;
@@ -410,7 +410,6 @@ experiment CityScopeVolpeDemo type: gui {
 		camera_pos: {4463.617380353552,3032.955173460968,4033.5415243977554} 
 		camera_look_pos: {4464.718608885005,3026.0022901525017,0.1794988227075576} 
 		camera_up_vector: {0.15643422677690633,0.9876868362601618,0.0017453283655837362}{
-			//species building aspect: base refresh:false position:{0,0,-0.001};
 			//species road aspect: base refresh:false;
 			species amenity aspect: base ;
 			species people aspect: scaleTable;
@@ -419,11 +418,13 @@ experiment CityScopeVolpeDemo type: gui {
            
             graphics "edges" {
 		      //Creation of the edges of adjacence
-				if (my_graph != nil  and drawInteraction = true ) {
+
+				if (my_graph != nil  and (drawInteraction = true or toggle1=6) ) {
+					
 					loop eg over: my_graph.edges {
 						geometry edge_geom <- geometry(eg);
 						float val <- 255 * edge_geom.perimeter / distance; 
-						draw line(edge_geom.points)  color:#white;
+						draw line(edge_geom.points)  color:rgb(0,125,0,75);
 					}
 				}	
 			}	
