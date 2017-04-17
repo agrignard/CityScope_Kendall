@@ -314,6 +314,10 @@ species people skills:[moving]{
 	aspect scale{
       draw circle(20) color: scale_color[scale];
 	}
+	
+	aspect scaleTable{
+      draw circle(4) color: scale_color[scale];
+	}
 }
 
 species amenity schedules:[]{
@@ -405,7 +409,7 @@ experiment CityScopeVolpeDemo type: gui {
 			//species building aspect: base refresh:false position:{0,0,-0.001};
 			//species road aspect: base refresh:false;
 			species amenity aspect: base ;
-			species people aspect: scale;
+			species people aspect: scaleTable;
 			//species mobileData aspect:base;
 
            
