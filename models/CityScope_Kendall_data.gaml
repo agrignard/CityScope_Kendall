@@ -69,7 +69,7 @@ global {
 	bool drawInteraction <- false parameter: "Draw Interaction:" category: "Visualization";
 	bool onlineGrid <-true parameter: "Online Grid:" category: "Environment";
 	bool dynamicGrid <-true parameter: "Update Grid:" category: "Environment";
-	bool realAmenity <-false parameter: "Real Amenities:" category: "Environment";
+	bool realAmenity <-true parameter: "Real Amenities:" category: "Environment";
 	int refresh <- 50 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Environment";
 	
 	init {
@@ -78,7 +78,7 @@ global {
 		the_graph <- as_edge_graph(road);
 		create table from: table_bound_shapefile;
         
-        if(realAmenity){
+        if(realAmenity = true){
           create amenity from: amenities_shapefile with: [type::string(read ("amenity"))]{
 	        color <- rgb(amenities_map_settings[type][0]);
 		    shape <- geometry(amenities_map_settings[type][1]) at_location location;
@@ -163,7 +163,7 @@ global {
               }	        
         }
         ask amenity{
-          if (x = 0 and y = 0){
+          if ((x = 0 and y = 0) and fromGrid = true){
             do die;
           }
         }	
