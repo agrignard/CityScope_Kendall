@@ -66,7 +66,7 @@ global {
 	bool moveOnRoadNetworkGlobal <- true parameter: "Move on road network:" category: "Simulation";
 	int distance parameter: 'distance ' category: "Visualization" min: 1 <- 100#m;	
 	bool drawInteraction <- false parameter: "Draw Interaction:" category: "Visualization";
-	bool onlineGrid <-false parameter: "Online Grid:" category: "Environment";
+	bool onlineGrid <-true parameter: "Online Grid:" category: "Environment";
 	bool dynamicGrid <-false parameter: "Update Grid:" category: "Environment";
 	bool realAmenity <-false parameter: "Real Amenities:" category: "Environment";
 	int refresh <- 1000 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Environment";
@@ -88,28 +88,35 @@ global {
         }
 	    	
 		do initGrid;
+
+		ask building where  (each.usage="R"){
+			surface <- shape.area;
+			
+			create people number: surface/2000 {
+				speed <- min_speed + rnd (max_speed - min_speed) ;
+				initialSpeed <-speed;
+				time_to_work <- min_work_start + rnd (max_work_start - min_work_start) ;
+				time_to_lunch <- min_lunch_start + rnd (max_lunch_start - min_lunch_start) ;
+				time_to_rework <- min_rework_start + rnd (max_rework_start - min_rework_start) ;
+				time_to_dinner <- min_dinner_start + rnd (max_dinner_start - min_dinner_start) ;
+				time_to_sleep <- min_work_end + rnd (max_work_end - min_work_end) ;
+				//scale<-scale_string[rnd(2)];
+				scale <- myself.scale;			
+				//living_place <- one_of(building where (each.usage="R" and each.scale=scale)) ;
+				living_place <- myself;
+				working_place <- one_of(building  where (each.usage="O" and each.scale=scale)) ;
+				eating_place <- one_of(amenity where (each.scale=scale )) ;
+				//eating_place <- one_of(amenity where (each.scale=scale and (each.type="fast_food" or each.type="restaurant" or each.type="cafe"))) ;
+				//dining_place <- one_of(amenity where ((each.type="arts_centre" or each.type="theatre" or each.type="bar")));
+				dining_place <- one_of(amenity where (each.scale=scale )) ;
+				objective <- "resting";
+				location <- any_location_in (living_place); 
+				if (flip(0.1)){
+					moveOnRoad <-false;
+				}
+			}				
+		}
 		
-		create people number: nb_people {
-			speed <- min_speed + rnd (max_speed - min_speed) ;
-			initialSpeed <-speed;
-			time_to_work <- min_work_start + rnd (max_work_start - min_work_start) ;
-			time_to_lunch <- min_lunch_start + rnd (max_lunch_start - min_lunch_start) ;
-			time_to_rework <- min_rework_start + rnd (max_rework_start - min_rework_start) ;
-			time_to_dinner <- min_dinner_start + rnd (max_dinner_start - min_dinner_start) ;
-			time_to_sleep <- min_work_end + rnd (max_work_end - min_work_end) ;
-			scale<-scale_string[rnd(2)];			
-			living_place <- one_of(building where (each.usage="R" and each.scale=scale)) ;
-			working_place <- one_of(building  where (each.usage="O" and each.scale=scale)) ;
-			eating_place <- one_of(amenity where (each.scale=scale )) ;
-			//eating_place <- one_of(amenity where (each.scale=scale and (each.type="fast_food" or each.type="restaurant" or each.type="cafe"))) ;
-			//dining_place <- one_of(amenity where ((each.type="arts_centre" or each.type="theatre" or each.type="bar")));
-			dining_place <- one_of(amenity where (each.scale=scale )) ;
-			objective <- "resting";
-			location <- any_location_in (living_place); 
-			if (flip(0.1)){
-				moveOnRoad <-false;
-			}
-		}	
 	}
 	
 	
@@ -137,7 +144,7 @@ global {
 				  shape <- square(60) at_location location;	
 				  type <- one_of(amenity_type);
 				  fromGrid<-true;  
-				  if(id!=-1 and id!=-2 and id!=6){
+				  if(id!=-1 and id!=-2 and id!=6 and id!=7){
 				  	usage <- citymatrix_map_settings[id][0];
 				  	scale <- citymatrix_map_settings[id][1];
 				  	color<-scale_color[scale];
@@ -149,9 +156,15 @@ global {
 				  if(id=6){
 				  	color<-#gray;
 				  }
-				  
-				 	
-              }				        
+				  if(id=7){
+				  	color<-#pink;
+				  }	
+              }	
+              ask amenity{
+              	if (x = 0 and y = 0){
+              		do die;
+              	}
+              }			        
         }
 	}
 	
@@ -189,6 +202,7 @@ species building schedules: []{
 	string scale;
 	rgb color <- #gray  ;
 	float depth;
+	float surface;
 	
 	aspect base {	
      	draw shape color: rgb(50,50,50,125);// depth:depth*shape.area*0.00005;	
@@ -351,8 +365,8 @@ experiment CityScopeDev type: gui {
 		
 		display CityScope  type:opengl background:#black {
 			species table aspect:base;
-			species building aspect: usage refresh:false position:{0,0,-0.001};
-			species building aspect: scale refresh:false position:{0,0,-0.001};
+			//species building aspect: usage refresh:false position:{0,0,-0.001};
+			//species building aspect: scale refresh:false position:{0,0,-0.001};
 			species road aspect: base refresh:false;
 			species amenity aspect: base ;
 			species people aspect: scale;
