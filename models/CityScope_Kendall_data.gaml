@@ -318,7 +318,7 @@ species people skills:[moving]{
 	}
 	
 	aspect scaleTable{
-		if(toggle1 = 0 or toggle1 = 1 or toggle1 = 6 or toggle1 = 9){
+		if(toggle1 > 4 ){
 			draw circle(4) color: scale_color[scale];
 		}   
 	}
@@ -377,6 +377,8 @@ experiment CityScopeDev type: gui {
 			species road aspect: base refresh:false;
 			species amenity aspect: base ;
 			species people aspect: scale;
+			
+		
 			graphics "text" 
 			{
                draw string(current_hour) + "h" color: # white font: font("Helvetica", 25, #italic) at: { 5700, 6200};
@@ -416,6 +418,7 @@ experiment CityScopeVolpeDemo type: gui {
 			//species mobileData aspect:base;
 
            
+             
             graphics "edges" {
 		      //Creation of the edges of adjacence
 
@@ -427,7 +430,14 @@ experiment CityScopeVolpeDemo type: gui {
 						draw line(edge_geom.points)  color:rgb(0,125,0,75);
 					}
 				}	
-			}	
+			}
+			
+			
+		    graphics "black" 
+			{
+               draw rectangle(700,700) rotated_by 9.74 color:#black at: { 2750, 2150};
+            }
+				
 		}
 	}
 }
