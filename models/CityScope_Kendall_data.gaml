@@ -413,7 +413,7 @@ experiment CityScopeVolpeDemo type: gui {
 		camera_look_pos: {4464.718608885005,3026.0022901525017,0.1794988227075576} 
 		camera_up_vector: {0.15643422677690633,0.9876868362601618,0.0017453283655837362}{
 			//species road aspect: base refresh:false;
-			species amenity aspect: base ;
+			//species amenity aspect: base ;
 			species people aspect: scaleTable;
 			//species mobileData aspect:base;
 
