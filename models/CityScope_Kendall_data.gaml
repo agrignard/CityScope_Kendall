@@ -85,6 +85,7 @@ global {
 		    usage <- usage_string[rnd(1)];
 		    scale <- scale_string[rnd(2)];	
 		    fromGrid<-false;
+		    size<-10+rnd(20);
 		  }		
         }
 	    	
@@ -144,6 +145,7 @@ global {
 				  location<- {(location.x * cos(angle) + location.y * sin(angle)),-location.x * sin(angle) + location.y * cos(angle)};
 				  shape <- square(60) at_location location;	
 				  type <- one_of(amenity_type);
+				  size<-10+rnd(10);
 				  fromGrid<-true;  
 				  if(id!=-1 and id!=-2 and id!=6 and id!=7){
 				  	usage <- citymatrix_map_settings[id][0];
@@ -174,7 +176,7 @@ global {
 	}
 	
 	
-    reflex updateDegreeMax when:(drawInteraction=true or toggle1=6){
+    reflex updateDegreeMax when:(drawInteraction=true or toggle1=7){
 		do degreeMax_computation;
 	}
 
@@ -297,7 +299,7 @@ species people skills:[moving]{
 		}
 	}
 	
-	reflex compute_degree when:(drawInteraction=true or toggle1=6){
+	reflex compute_degree when:(drawInteraction=true or toggle1=7){
 		degree <- my_graph = nil ? 0 : (my_graph) degree_of (self);
 		radius <- ((((degree + 1) ^ 1.4) / (degreeMax))) * 5;
 		color <- hsb(0.66,degree / (degreeMax + 1), 0.5);
@@ -335,6 +337,7 @@ species amenity schedules:[]{
 	rgb color;
 	int x;
 	int y;
+	int size;
 	
 	reflex countPeople{
 		pop <-length(people overlapping self.shape);
@@ -344,10 +347,23 @@ species amenity schedules:[]{
 			draw shape rotated_by -angle color: rgb(color.red, color.green, color.blue,75);//depth:pop*10;	
 		}
 		else{
-		  draw circle(30) empty:true border:#white color: #white;//depth:pop*10;
-		  draw circle(30) color: rgb(255,255,255,125);//depth:pop*10;	
+			if (toggle1 =  6){
+			  draw circle(size) empty:true border:#white color: #white;//depth:pop*10;
+		      draw circle(size) color: rgb(255,255,255,125);//depth:pop*10;	
+			}
 		}
-			
+	}
+	
+		aspect baseTable {
+		if(fromGrid){
+			//draw shape rotated_by -angle color: rgb(color.red, color.green, color.blue,75);//depth:pop*10;	
+		}
+		else{
+			if (toggle1 =  6){
+			  draw circle(size) empty:true border:#white color: #white;//depth:pop*10;
+		      draw circle(size) color: rgb(255,255,255,125);//depth:pop*10;	
+			}
+		}
 	}
 }
 
@@ -413,7 +429,7 @@ experiment CityScopeVolpeDemo type: gui {
 		camera_look_pos: {4464.718608885005,3026.0022901525017,0.1794988227075576} 
 		camera_up_vector: {0.15643422677690633,0.9876868362601618,0.0017453283655837362}{
 			//species road aspect: base refresh:false;
-			//species amenity aspect: base ;
+			species amenity aspect: baseTable ;
 			species people aspect: scaleTable;
 			//species mobileData aspect:base;
 
@@ -422,7 +438,7 @@ experiment CityScopeVolpeDemo type: gui {
             graphics "edges" {
 		      //Creation of the edges of adjacence
 
-				if (my_graph != nil  and (drawInteraction = true or toggle1=6) ) {
+				if (my_graph != nil  and (drawInteraction = true or toggle1=7) ) {
 					
 					loop eg over: my_graph.edges {
 						geometry edge_geom <- geometry(eg);
@@ -435,7 +451,7 @@ experiment CityScopeVolpeDemo type: gui {
 			
 		    graphics "black" 
 			{
-               draw rectangle(700,700) rotated_by 9.74 color:#black at: { 2750, 2150};
+               draw rectangle(900,700) rotated_by 9.74 color:#black at: { 2500, 2150};
             }
 				
 		}
