@@ -48,7 +48,7 @@ global {
 	//PARAMETERS
 	bool moveOnRoadNetworkGlobal <- true parameter: "Move on road network:" category: "Simulation";
 	int distance parameter: 'distance ' category: "Visualization" min: 1 <- 100#m;	
-	bool drawInteraction <- true parameter: "Draw Interaction:" category: "Visualization";
+	bool drawInteraction <- false parameter: "Draw Interaction:" category: "Visualization";
 	bool onlineGrid <-true parameter: "Online Grid:" category: "Environment";
 	bool dynamicGrid <-true parameter: "Update Grid:" category: "Environment";
 	bool realAmenity <-true parameter: "Real Amenities:" category: "Environment";
@@ -147,7 +147,7 @@ global {
 		do initGrid;
 	}
 	
-	reflex updateGraph when:drawInteraction = true{
+	reflex updateGraph when:(drawInteraction = true or toggle1 = 7){
 		interaction_graph <- people as_distance_graph(distance);
 	}
 }
