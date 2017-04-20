@@ -91,7 +91,7 @@ global {
 				}
 			}				
 		}
-		interaction_graph <- people as_distance_graph(distance);
+		
 	}
 	
 	
@@ -145,6 +145,10 @@ global {
 	
 	reflex updateGrid when: ((cycle mod refresh) = 0) and (dynamicGrid = true){	
 		do initGrid;
+	}
+	
+	reflex updateGraph when:drawInteraction = true{
+		interaction_graph <- people as_distance_graph(distance);
 	}
 }
 
