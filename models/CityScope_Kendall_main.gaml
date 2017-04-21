@@ -16,6 +16,26 @@ global {
 	file imageRaster <- file('../images/gama_black.png') ;
 	geometry shape <- envelope(bound_shapefile);
 	graph road_graph;
+	graph interaction_graph;
+	
+	//////////// CITYMATRIX   //////////////
+	map<string, unknown> cityMatrixData;
+	list<map<string, int>> cityMatrixCell;
+	list<float> density_array;
+	int toggle1;
+	map<int,list> citymatrix_map_settings<- [-1::["Green","Green"],0::["R","L"],1::["R","M"],2::["R","S"],3::["O","L"],4::["O","M"],5::["O","S"],6::["A","Road"],7::["A","Plaza"]];	
+	map<string,rgb> color_map<- ["R"::#white, "O"::#gray,"S"::#gamablue, "M"::#gamaorange, "L"::#gamared, "Green"::#green, "Plaza"::#brown, "Road"::#gray]; 
+	list scale_string<- ["S", "M", "L"];
+	list usage_string<- ["R", "O"]; 
+	
+	//PARAMETERS
+	bool moveOnRoadNetworkGlobal <- true parameter: "Move on road network:" category: "Simulation";
+	int distance parameter: 'distance ' category: "Visualization" min: 1 <- 100#m;	
+	bool drawInteraction <- false parameter: "Draw Interaction:" category: "Visualization";
+	bool onlineGrid <-true parameter: "Online Grid:" category: "Environment";
+	bool dynamicGrid <-true parameter: "Update Grid:" category: "Environment";
+	bool realAmenity <-true parameter: "Real Amenities:" category: "Environment";
+	int refresh <- 50 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Environment";
 	
 	float step <- 10 #sec;
 	int current_hour update: (time / #hour) mod 24 ;
@@ -31,29 +51,7 @@ global {
 	int max_work_end <- 22; 
 	float min_speed <- 4 #km / #h;
 	float max_speed <- 6 #km / #h; 
-
 	float angle <--9.74;
-	
-	//////////// CITYMATRIX GRID  //////////////
-	map<string, unknown> cityMatrixData;
-	list<map<string, int>> cityMatrixCell;
-	list<float> density_array;
-	int toggle1;
-	map<int,list> citymatrix_map_settings<- [-1::["Green","Green"],0::["R","L"],1::["R","M"],2::["R","S"],3::["O","L"],4::["O","M"],5::["O","S"],6::["A","Road"],7::["A","Plaza"]];	
-	map<string,rgb> color_map<- ["R"::#white, "O"::#gray,"S"::#gamablue, "M"::#gamaorange, "L"::#gamared, "Green"::#green, "Plaza"::#brown, "Road"::#gray]; 
-	list scale_string<- ["S", "M", "L"];
-	list usage_string<- ["R", "O"]; 
-	//INTERACTION GRAPH 
-	graph interaction_graph;
-	
-	//PARAMETERS
-	bool moveOnRoadNetworkGlobal <- true parameter: "Move on road network:" category: "Simulation";
-	int distance parameter: 'distance ' category: "Visualization" min: 1 <- 100#m;	
-	bool drawInteraction <- false parameter: "Draw Interaction:" category: "Visualization";
-	bool onlineGrid <-true parameter: "Online Grid:" category: "Environment";
-	bool dynamicGrid <-true parameter: "Update Grid:" category: "Environment";
-	bool realAmenity <-true parameter: "Real Amenities:" category: "Environment";
-	int refresh <- 50 min: 1 max:1000 parameter: "Refresh rate (cycle):" category: "Environment";
 	
 	init {
 		create building from: buildings_shapefile with: [usage::string(read ("Usage")),scale::string(read ("Scale"))];
