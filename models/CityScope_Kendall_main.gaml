@@ -13,7 +13,7 @@ global {
 	file roads_shapefile <- file("../includes/Roads.shp");
 	file amenities_shapefile <- file("../includes/Amenities.shp");
 	file table_bound_shapefile <- file("../includes/table_bounds.shp");
-	file imageRaster <- file('../images/gama_black.png') ;
+	file imageRaster <- file('../includes/images/gama_black.png') ;
 	geometry shape <- envelope(bound_shapefile);
 	graph road_graph;
 	graph interaction_graph;
